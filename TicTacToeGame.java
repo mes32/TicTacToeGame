@@ -27,15 +27,15 @@ class TicTacToeGame {
         while(true) {
             player1.makeMove(board);
             board.print();
-            if (board.isWon()) {
-                board.winMessage();
+            if (board.isFinished(player1)) {
+                board.printWinMessage();
                 break;
             }
 
             player2.makeMove(board);
             board.print();
-            if (board.isWon()) {
-                board.winMessage();
+            if (board.isFinished(player2)) {
+                board.printWinMessage();
                 break;
             }
         }
@@ -100,6 +100,8 @@ class Board {
     private Player player1;
     private Player player2;
 
+    private String winMessage = "";
+
     BoardSpace[] spaces = new BoardSpace[9];
 
     Board(Player player1, Player player2) {
@@ -112,11 +114,66 @@ class Board {
     }
 
     public void update(Player player, int position) {
-        spaces[position].setSpace(player.getState(), player.getToken());
+        spaces[position].set(player.getState(), player.getToken());
     }
 
-    public boolean isWon() {
+    public boolean isFinished(Player currentPlayer) {
+
+        if (isFilled()) {
+            winMessage = "Nobody wins!";
+            return true;
+        }
+
+        if (hasPlayerWon(currentPlayer)) {
+            winMessage = currentPlayer.getName() + " wins!";
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean isFilled() {
+
+        for (int i=0; i < spaces.length; i++) {
+            if (spaces[i].getState() == BoardState.EMPTY) {
+                return false;
+            }
+        }
+
         return true;
+    }
+
+    private boolean hasPlayerWon(Player player) {
+
+        // Board as indexed by array 'spaces':
+        //  0  1  2
+        //  3  4  5
+        //  6  7  8 
+
+        BoardState p = player.getState();
+        if (spaces[4].getState() == p) {
+            // Check for lines passing though center
+            if (spaces[1].getState() == p && spaces[7].getState() == p ||
+                spaces[3].getState() == p && spaces[5].getState() == p ||
+                spaces[0].getState() == p && spaces[8].getState() == p ||
+                spaces[2].getState() == p && spaces[6].getState() == p ) {
+                return true;
+            }
+        } else if (spaces[0].getState() == p) {
+            // Check for edge lines passing though top left
+            if (spaces[1].getState() == p && spaces[2].getState() == p ||
+                spaces[3].getState() == p && spaces[6].getState() == p ) {
+                return true;
+            }
+        } else if (spaces[8].getState() == p) {
+            // Check for edge lines passing though bottom right
+            if (spaces[2].getState() == p && spaces[5].getState() == p ||
+                spaces[6].getState() == p && spaces[7].getState() == p ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void print() {
@@ -132,19 +189,19 @@ class Board {
 
         String out = "\n"
         + "        |   |    \n"
-        + "      " + spaces[0] + " | " + spaces[1] + " | " + spaces[2] + "  \n"
+        + "      " + spaces[0] + " | " + spaces[1] + " | " + spaces[2] + "      1   2   3  \n"
         + "    -------------\n" 
-        + "      " + spaces[3] + " | " + spaces[4] + " | " + spaces[5] + "  \n"
+        + "      " + spaces[3] + " | " + spaces[4] + " | " + spaces[5] + "      4   5   6  \n"
         + "    -------------\n"
-        + "      " + spaces[6] + " | " + spaces[7] + " | " + spaces[8] + "  \n"
+        + "      " + spaces[6] + " | " + spaces[7] + " | " + spaces[8] + "      7   8   9  \n"
         + "        |   |    \n"
         + "                 \n";
 
         System.out.print(out);
     }
 
-    public void winMessage() {
-        System.out.println("Nobody wins!");
+    public void printWinMessage() {
+        System.out.println(winMessage);
     }
 }
 
@@ -157,12 +214,17 @@ class BoardSpace {
     private char token;
 
     BoardSpace() {
+        state = BoardState.EMPTY;
         token = ' ';
     }
 
-    public void setSpace(BoardState state, char token) {
+    public void set(BoardState state, char token) {
         this.state = state;
         this.token = token;
+    }
+
+    public BoardState getState() {
+        return state;
     }
 
     public String toString() {
