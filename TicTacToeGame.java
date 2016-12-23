@@ -6,6 +6,8 @@
 
 import java.io.*;
 import java.util.*;
+import java.lang.*;
+
 
 class TicTacToeGame {
     public static void main(String[] args) {
@@ -14,7 +16,7 @@ class TicTacToeGame {
 
         boolean playerStarts = humanPlayerStarts();
         if (playerStarts) {
-            System.out.println("Player goes first.");
+            System.out.println("You go first.");
         } else {
             System.out.println("Machine goes first.");
         }
@@ -81,9 +83,15 @@ class Board {
     private Player player1;
     private Player player2;
 
+    BoardSpace[] spaces = new BoardSpace[9];
+
     Board(Player player1, Player player2) {
         this.player1 = player1;
         this.player2 = player2;
+
+        for (int i=0; i < spaces.length; i++) {
+            spaces[i] = new BoardSpace();
+        }
     }
 
     public void update(char token, int move) {
@@ -95,10 +103,42 @@ class Board {
     }
 
     public void print() {
-        System.out.println("[Board goes here]");
+
+        // Example:
+        //    |   |
+        //  X | X | X
+        // -------------
+        //  X | X | X
+        // -------------
+        //  X | X | X 
+        //    |   |
+
+        String out = "\n"
+        + "        |   |    \n"
+        + "      " + spaces[0] + " | " + spaces[1] + " | " + spaces[2] + "  \n"
+        + "    -------------\n" 
+        + "      " + spaces[3] + " | " + spaces[4] + " | " + spaces[5] + "  \n"
+        + "    -------------\n"
+        + "      " + spaces[6] + " | " + spaces[7] + " | " + spaces[8] + "  \n"
+        + "        |   |    \n"
+        + "                 \n";
+
+        System.out.print(out);
     }
 
     public void winMessage() {
         System.out.println("Nobody wins!");
+    }
+}
+
+class BoardSpace {
+    private char token;
+
+    BoardSpace() {
+        token = ' ';
+    }
+
+    public String toString() {
+        return Character.toString(token);
     }
 }
