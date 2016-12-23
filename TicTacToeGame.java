@@ -85,10 +85,21 @@ class Player {
 
         System.out.print(name + "'s move: ");
 
-        if (isHuman) {
-            Scanner scan = new Scanner(System.in);
-            int position = scan.nextInt() - 1;
-            board.update(this, position);
+        try {
+            if (isHuman) {
+                Scanner scan = new Scanner(System.in);
+                int position = scan.nextInt() - 1;
+                board.update(this, position);
+            }
+        } catch (InputMismatchException e) {
+            System.err.println("  ***  Must be an integer. Try again.  ***");
+            makeMove(board);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("  ***  Must be in range 1 through 9. Try again.  ***");
+            makeMove(board);
+        } catch (SpaceTakenException e) {
+            System.err.println("  ***  That space is already taken. Try again.  ***");
+            makeMove(board);    
         }
     }
 }
@@ -113,7 +124,10 @@ class Board {
         }
     }
 
-    public void update(Player player, int position) {
+    public void update(Player player, int position) throws SpaceTakenException {
+        if (spaces[position].getState() != BoardState.EMPTY) {
+            throw new SpaceTakenException();
+        }
         spaces[position].set(player.getState(), player.getToken());
     }
 
@@ -237,4 +251,10 @@ class BoardSpace {
  */
 enum BoardState {
     EMPTY, PLAYER_1, PLAYER_2
+}
+
+class SpaceTakenException extends Exception {
+    SpaceTakenException() {
+        super();
+    }
 }
