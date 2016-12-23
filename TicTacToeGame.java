@@ -11,8 +11,8 @@ import java.lang.*;
 
 class TicTacToeGame {
     public static void main(String[] args) {
-        Player player1 = new Player("Player 1", 'X');
-        Player player2 = new Player("Player 2", 'O');
+        Player player1 = new Player("Player 1", BoardState.PLAYER_1, 'X');
+        Player player2 = new Player("Player 2", BoardState.PLAYER_2, 'O');
 
         boolean playerStarts = humanPlayerStarts();
         if (playerStarts) {
@@ -38,8 +38,6 @@ class TicTacToeGame {
                 board.winMessage();
                 break;
             }
-
-            break;
         }
     }
 
@@ -55,13 +53,18 @@ class TicTacToeGame {
     }
 }
 
+/**
+ * A player entity. May be the user or the computer.
+ */
 class Player {
     private String name;
+    private BoardState state;
     private char token;
     private boolean isHuman;
 
-    Player(String name, char token) {
+    Player(String name, BoardState state, char token) {
         this.name = name;
+        this.state = state;
         this.token = token;
         this.isHuman = true;
     }
@@ -70,15 +73,29 @@ class Player {
         return name;
     }
 
+    public BoardState getState() {
+        return state;
+    }
+
     public char getToken() {
         return token;
     }
 
     public void makeMove(Board board) {
-        board.update(token, 0);
+
+        System.out.print(name + "'s move: ");
+
+        if (isHuman) {
+            Scanner scan = new Scanner(System.in);
+            int position = scan.nextInt() - 1;
+            board.update(this, position);
+        }
     }
 }
 
+/**
+ * The tic-tac-toe game board
+ */
 class Board {
     private Player player1;
     private Player player2;
@@ -94,8 +111,8 @@ class Board {
         }
     }
 
-    public void update(char token, int move) {
-
+    public void update(Player player, int position) {
+        spaces[position].setSpace(player.getState(), player.getToken());
     }
 
     public boolean isWon() {
@@ -131,14 +148,31 @@ class Board {
     }
 }
 
+/**
+ * One of the nine spaces on the tic-tac-toe board
+ */
 class BoardSpace {
+
+    private BoardState state;
     private char token;
 
     BoardSpace() {
         token = ' ';
     }
 
+    public void setSpace(BoardState state, char token) {
+        this.state = state;
+        this.token = token;
+    }
+
     public String toString() {
         return Character.toString(token);
     }
+}
+
+/**
+ * Status of a space on the board. Available, taken by Player 1, or taken by Player 2.
+ */
+enum BoardState {
+    EMPTY, PLAYER_1, PLAYER_2
 }
