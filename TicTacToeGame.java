@@ -138,6 +138,7 @@ class ComputerPlayer extends Player {
     private int aiMove(Board board) {
         int[] validMoves = board.listEmptySpaces();
         int[] scores = new int[validMoves.length];
+
         for (int i=0; i < scores.length; i++) {
             scores[i] = minimax(board, validMoves[i], this, 0);
         }
@@ -147,16 +148,64 @@ class ComputerPlayer extends Player {
     }
 
     private int minimax(Board board, int move, Player currentPlayer, int depth) {
-        return 10;
+
+        Board hypothetical = board.clone();
+        // Current player makes a hypothetical/simulated move
+        try {
+            hypothetical.update(currentPlayer, move);
+        } catch (Exception e) {
+            return -100;
+        }
+
+        if (hypothetical.isFinished(currentPlayer)) {
+            return scoreOutcome(hypothetical, depth);
+        }
+
+        int[] validMoves = hypothetical.listEmptySpaces();
+        int[] scores = new int[validMoves.length];
+        Player nextPlayer;
+        if (currentPlayer == this) {
+            nextPlayer = otherPlayer;
+        } else {
+            nextPlayer = this;
+        }
+        depth += 1;
+
+        for (int i=0; i < scores.length; i++) {
+            scores[i] = minimax(hypothetical, validMoves[i], nextPlayer, depth);
+        }
+
+        // On this player's turns maximize wins. On other player's turns minimize losses.
+        if (nextPlayer == this) {
+
+            // This is the maximization calculation
+            int maxScore = scores[0];
+            for (int i=1; i < scores.length; i++) {
+                if (scores[i] > maxScore) {
+                    maxScore = scores[i];
+                }
+            }
+            return maxScore;
+        } else {
+
+            // This is the minimization calculation
+            int minScore = scores[0];
+            for (int i=1; i < scores.length; i++) {
+                if (scores[i] < minScore) {
+                    minScore = scores[i];
+                }
+            }
+            return minScore;
+        }
     }
 
     private int scoreOutcome(Board hypothetical, int depth) {
         if (hypothetical.hasPlayerWon(this)) {
             return 10 - depth;
-        } else if (hypothetical.isFilled()) {
-            return 0;
-        } else {
+        } else if (hypothetical.hasPlayerWon(this.otherPlayer)) {
             return -10 + depth;
+        } else {
+            return 0;
         }
     }
 
@@ -184,7 +233,7 @@ class ComputerPlayer extends Player {
 /**
  * The tic-tac-toe game board
  */
-class Board {
+class Board implements Cloneable {
     private Player player1;
     private Player player2;
 
@@ -199,6 +248,22 @@ class Board {
         for (int i=0; i < spaces.length; i++) {
             spaces[i] = new BoardSpace();
         }
+    }
+
+    public Board clone() {
+        Board clone = new Board(this.player1, this.player2);
+        for (int i=0; i < spaces.length; i++) {
+            clone.setSpace(i, this.getSpace(i).clone());
+        }
+        return clone;
+    }
+
+    public void setSpace(int index, BoardSpace space) {
+        this.spaces[index] = space;
+    }
+
+    public BoardSpace getSpace(int index) {
+        return this.spaces[index];
     }
 
     public void update(Player player, int position) throws SpaceTakenException {
@@ -320,7 +385,7 @@ class Board {
 /**
  * One of the nine spaces on the tic-tac-toe board
  */
-class BoardSpace {
+class BoardSpace implements Cloneable {
 
     private BoardState state;
     private char token;
@@ -328,6 +393,16 @@ class BoardSpace {
     BoardSpace() {
         state = BoardState.EMPTY;
         token = ' ';
+    }
+
+    BoardSpace(BoardState state, char token) {
+        this.state = state;
+        this.token = token;
+    }
+
+    public BoardSpace clone() {
+        BoardSpace clone = new BoardSpace(this.state, this.token);
+        return clone;
     }
 
     public void set(BoardState state, char token) {
