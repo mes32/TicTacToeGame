@@ -108,6 +108,11 @@ class Player {
  */
 class ComputerPlayer extends Player {
 
+    private static final int SCORE_WIN     = 10;
+    private static final int SCORE_LOSS    = -10;
+    private static final int SCORE_TIE     = 0;
+    private static final int SCORE_INVALID = -100;
+
     private Player otherPlayer;
 
     ComputerPlayer(Player self, Player other) {
@@ -154,7 +159,7 @@ class ComputerPlayer extends Player {
         try {
             hypothetical.update(currentPlayer, move);
         } catch (Exception e) {
-            return -100;
+            return SCORE_INVALID;
         }
 
         if (hypothetical.isFinished(currentPlayer)) {
@@ -201,11 +206,11 @@ class ComputerPlayer extends Player {
 
     private int scoreOutcome(Board hypothetical, int depth) {
         if (hypothetical.hasPlayerWon(this)) {
-            return 10 - depth;
+            return SCORE_WIN - depth;
         } else if (hypothetical.hasPlayerWon(this.otherPlayer)) {
-            return -10 + depth;
+            return SCORE_LOSS + depth;
         } else {
-            return 0;
+            return SCORE_TIE;
         }
     }
 
