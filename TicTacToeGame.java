@@ -129,7 +129,7 @@ class ComputerPlayer extends Player {
     public void makeMove(Board board) {
 
         int position = aiMove(board);
-        System.out.print(name + "'s move: " + (position + 1));
+        System.out.println(name + "'s move: " + (position + 1));
 
         try {
             board.update(this, position);
@@ -146,8 +146,10 @@ class ComputerPlayer extends Player {
     }
 
     private int aiMove(Board board) {
-        Random rand = new Random(); 
-        return rand.nextInt(9);
+        int[] validMoves = board.listEmptySpaces();
+        Random rand = new Random();
+        int index = rand.nextInt(validMoves.length);
+        return validMoves[index];
     }
 }
 
@@ -259,6 +261,23 @@ class Board {
         + "                 \n";
 
         System.out.print(out);
+    }
+
+    public int[] listEmptySpaces() {
+
+        List<Integer> list = new ArrayList<Integer>();
+
+        for (int i=0; i < spaces.length; i++) {
+            if (spaces[i].getState() == BoardState.EMPTY) {
+                list.add(i);
+            }
+        }
+
+        int[] array = new int[list.size()];
+        for (int i=0; i < array.length; i++) {
+            array[i] = list.get(i).intValue();
+        }
+        return array;
     }
 
     public void printWinMessage() {
