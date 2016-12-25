@@ -10,15 +10,31 @@ import java.lang.*;
 
 
 class TicTacToeGame {
+
+    private static final String      NAME_P1 = "Player 1";
+    private static final BoardState STATE_P1 = BoardState.PLAYER_1;
+    private static final char       TOKEN_P1 = 'X';
+
+    private static final String      NAME_P2 = "Player 2";
+    private static final BoardState STATE_P2 = BoardState.PLAYER_2;
+    private static final char       TOKEN_P2 = 'O';
+
     public static void main(String[] args) {
-        Player player1 = new Player("Player 1", BoardState.PLAYER_1, 'X');
-        Player player2 = new Player("Player 2", BoardState.PLAYER_2, 'O');
+
+        Player player1;
+        Player player2;
 
         boolean playerStarts = humanPlayerStarts();
         if (playerStarts) {
             System.out.println("You go first.");
+
+            player1 = new Player(NAME_P1, STATE_P1, TOKEN_P1);
+            player2 = new ComputerPlayer(NAME_P2, STATE_P2, TOKEN_P2);
         } else {
             System.out.println("Machine goes first.");
+
+            player1 = new ComputerPlayer(NAME_P1, STATE_P1, TOKEN_P1);
+            player2 = new Player(NAME_P2, STATE_P2, TOKEN_P2);
         }
 
         Board board = new Board(player1, player2);
@@ -54,19 +70,17 @@ class TicTacToeGame {
 }
 
 /**
- * A player entity. May be the user or the computer.
+ * A general player entity
  */
 class Player {
-    private String name;
-    private BoardState state;
-    private char token;
-    private boolean isHuman;
+    protected String name;
+    protected BoardState state;
+    protected char token;
 
     Player(String name, BoardState state, char token) {
         this.name = name;
         this.state = state;
         this.token = token;
-        this.isHuman = true;
     }
 
     public String getName() {
@@ -86,11 +100,9 @@ class Player {
         System.out.print(name + "'s move: ");
 
         try {
-            if (isHuman) {
-                Scanner scan = new Scanner(System.in);
-                int position = scan.nextInt() - 1;
-                board.update(this, position);
-            }
+            Scanner scan = new Scanner(System.in);
+            int position = scan.nextInt() - 1;
+            board.update(this, position);
         } catch (InputMismatchException e) {
             System.err.println("  ***  Must be an integer. Try again.  ***");
             makeMove(board);
@@ -101,6 +113,41 @@ class Player {
             System.err.println("  ***  That space is already taken. Try again.  ***");
             makeMove(board);    
         }
+    }
+}
+
+/**
+ * A computer player
+ */
+class ComputerPlayer extends Player {
+
+    ComputerPlayer(String name, BoardState state, char token) {
+        super(name, state, token);
+    }
+
+    @Override
+    public void makeMove(Board board) {
+
+        int position = aiMove(board);
+        System.out.print(name + "'s move: " + (position + 1));
+
+        try {
+            board.update(this, position);
+        } catch (InputMismatchException e) {
+            System.err.println("  ***  Must be an integer. Try again.  ***");
+            makeMove(board);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("  ***  Must be in range 1 through 9. Try again.  ***");
+            makeMove(board);
+        } catch (SpaceTakenException e) {
+            System.err.println("  ***  That space is already taken. Try again.  ***");
+            makeMove(board);    
+        }
+    }
+
+    private int aiMove(Board board) {
+        Random rand = new Random(); 
+        return rand.nextInt(9);
     }
 }
 
@@ -159,7 +206,7 @@ class Board {
 
     private boolean hasPlayerWon(Player player) {
 
-        // Board as indexed by array 'spaces':
+        // Board as indexed by the array 'spaces':
         //  0  1  2
         //  3  4  5
         //  6  7  8 
@@ -192,13 +239,13 @@ class Board {
 
     public void print() {
 
-        // Example:
+        // Example of board printed to stdout:
         //    |   |
-        //  X | X | X
+        //  X | X | X       1   2   3
         // -------------
-        //  X | X | X
+        //  X | X | X       4   5   6
         // -------------
-        //  X | X | X 
+        //  X | X | X       7   8   9 
         //    |   |
 
         String out = "\n"
