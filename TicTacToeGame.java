@@ -137,13 +137,17 @@ class ComputerPlayer extends Player {
 
     private int aiMove(Board board) {
         int[] validMoves = board.listEmptySpaces();
-        Random rand = new Random();
-        int index = rand.nextInt(validMoves.length);
-        return validMoves[index];
+        int[] scores = new int[validMoves.length];
+        for (int i=0; i < scores.length; i++) {
+            scores[i] = minimax(board, validMoves[i], this, 0);
+        }
+
+        int nextMove = validMoves[randomMaxIndex(scores)];
+        return nextMove;
     }
 
     private int minimax(Board board, int move, Player currentPlayer, int depth) {
-        return 0;
+        return 10;
     }
 
     private int scoreOutcome(Board hypothetical, int depth) {
@@ -154,6 +158,26 @@ class ComputerPlayer extends Player {
         } else {
             return -10 + depth;
         }
+    }
+
+    private static int randomMaxIndex(int[] scores) {
+        int max = scores[0];
+        for (int i=1; i < scores.length; i++) {
+            if (scores[i] > max) {
+                max = scores[i];
+            }
+        }
+
+        List<Integer> maxIndices = new ArrayList<Integer>();
+        for (int i=0; i < scores.length; i++) {
+            if (scores[i] == max) {
+                maxIndices.add(i);
+            }
+        }
+
+        Random rand = new Random();
+        int index = rand.nextInt(maxIndices.size());
+        return maxIndices.get(index).intValue();
     }
 }
 
@@ -235,7 +259,7 @@ class Board {
                 return true;
             }
         }
-        
+
         if (spaces[8].getState() == p) {
             // Check for edge lines passing though bottom right
             if (spaces[2].getState() == p && spaces[5].getState() == p ||
