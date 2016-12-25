@@ -149,8 +149,8 @@ class ComputerPlayer extends Player {
 
     private int minimax(Board board, int move, Player currentPlayer, int depth) {
 
-        Board hypothetical = board.clone();
         // Current player makes a hypothetical/simulated move
+        Board hypothetical = board.clone();
         try {
             hypothetical.update(currentPlayer, move);
         } catch (Exception e) {
@@ -237,8 +237,6 @@ class Board implements Cloneable {
     private Player player1;
     private Player player2;
 
-    private String winMessage = "";
-
     BoardSpace[] spaces = new BoardSpace[9];
 
     Board(Player player1, Player player2) {
@@ -275,17 +273,11 @@ class Board implements Cloneable {
 
     public boolean isFinished(Player currentPlayer) {
 
-        if (hasPlayerWon(currentPlayer)) {
-            winMessage = currentPlayer.getName() + " wins!";
+        if (hasPlayerWon(currentPlayer) || isFilled()) {
             return true;
+        } else {
+            return false;
         }
-
-        if (isFilled()) {
-            winMessage = "Nobody wins!";
-            return true;
-        }
-
-        return false;
     }
 
     public boolean isFilled() {
@@ -378,7 +370,13 @@ class Board implements Cloneable {
     }
 
     public void printWinMessage() {
-        System.out.println(winMessage);
+        if (hasPlayerWon(player1)) {
+            System.out.println(player1.getName() + " wins!");
+        } else if (hasPlayerWon(player2)) {
+            System.out.println(player2.getName() + " wins!");
+        } else {
+            System.out.println("Nobody wins!");
+        }
     }
 }
 
@@ -395,7 +393,7 @@ class BoardSpace implements Cloneable {
         token = ' ';
     }
 
-    BoardSpace(BoardState state, char token) {
+    private BoardSpace(BoardState state, char token) {
         this.state = state;
         this.token = token;
     }
@@ -426,6 +424,9 @@ enum BoardState {
     EMPTY, PLAYER_1, PLAYER_2
 }
 
+/**
+ * Exception thrown when trying to set an occupied 'BoardSpace'
+ */
 class SpaceTakenException extends Exception {
     SpaceTakenException() {
         super();
