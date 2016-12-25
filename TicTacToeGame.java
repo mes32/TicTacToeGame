@@ -11,30 +11,17 @@ import java.lang.*;
 
 class TicTacToeGame {
 
-    private static final String      NAME_P1 = "Player 1";
-    private static final BoardState STATE_P1 = BoardState.PLAYER_1;
-    private static final char       TOKEN_P1 = 'X';
-
-    private static final String      NAME_P2 = "Player 2";
-    private static final BoardState STATE_P2 = BoardState.PLAYER_2;
-    private static final char       TOKEN_P2 = 'O';
-
     public static void main(String[] args) {
 
-        Player player1;
-        Player player2;
+        Player player1 = new Player("Player 1", BoardState.PLAYER_1, 'X');
+        Player player2 = new Player("Player 2", BoardState.PLAYER_2, 'O');
 
-        boolean playerStarts = humanPlayerStarts();
-        if (playerStarts) {
-            System.out.println("You go first.");
-
-            player1 = new Player(NAME_P1, STATE_P1, TOKEN_P1);
-            player2 = new ComputerPlayer(NAME_P2, STATE_P2, TOKEN_P2);
-        } else {
+        if (computerGoesFirst()) {
             System.out.println("Machine goes first.");
-
-            player1 = new ComputerPlayer(NAME_P1, STATE_P1, TOKEN_P1);
-            player2 = new Player(NAME_P2, STATE_P2, TOKEN_P2);
+            player1 = new ComputerPlayer(player1, player2);
+        } else {
+            System.out.println("You go first.");
+            player2 = new ComputerPlayer(player2, player1);
         }
 
         Board board = new Board(player1, player2);
@@ -57,7 +44,7 @@ class TicTacToeGame {
         }
     }
 
-    private static boolean humanPlayerStarts() {
+    private static boolean computerGoesFirst() {
         Random rand = new Random(); 
         int value = rand.nextInt(2);
 
@@ -123,12 +110,9 @@ class ComputerPlayer extends Player {
 
     private Player otherPlayer;
 
-    ComputerPlayer(String name, BoardState state, char token) {
-        super(name, state, token);
-    }
-
-    public void setOtherPlayer(Player otherPlayer) {
-        this.otherPlayer = otherPlayer;
+    ComputerPlayer(Player self, Player other) {
+        super(self.getName(), self.getState(), self.getToken());
+        otherPlayer = other;
     }
 
     @Override
@@ -158,7 +142,7 @@ class ComputerPlayer extends Player {
         return validMoves[index];
     }
 
-    private int minimax(Board board, int move, int depth, boolean computersTurn) {
+    private int minimax(Board board, int move, Player currentPlayer, int depth) {
         return 0;
     }
 
