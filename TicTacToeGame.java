@@ -226,13 +226,17 @@ class Board {
                 spaces[2].getState() == p && spaces[6].getState() == p ) {
                 return true;
             }
-        } else if (spaces[0].getState() == p) {
+        }
+
+        if (spaces[0].getState() == p) {
             // Check for edge lines passing though top left
             if (spaces[1].getState() == p && spaces[2].getState() == p ||
                 spaces[3].getState() == p && spaces[6].getState() == p ) {
                 return true;
             }
-        } else if (spaces[8].getState() == p) {
+        }
+        
+        if (spaces[8].getState() == p) {
             // Check for edge lines passing though bottom right
             if (spaces[2].getState() == p && spaces[5].getState() == p ||
                 spaces[6].getState() == p && spaces[7].getState() == p ) {
