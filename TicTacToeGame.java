@@ -121,8 +121,14 @@ class Player {
  */
 class ComputerPlayer extends Player {
 
+    private Player otherPlayer;
+
     ComputerPlayer(String name, BoardState state, char token) {
         super(name, state, token);
+    }
+
+    public void setOtherPlayer(Player otherPlayer) {
+        this.otherPlayer = otherPlayer;
     }
 
     @Override
@@ -150,6 +156,20 @@ class ComputerPlayer extends Player {
         Random rand = new Random();
         int index = rand.nextInt(validMoves.length);
         return validMoves[index];
+    }
+
+    private int minimax(Board board, int move, int depth, boolean computersTurn) {
+        return 0;
+    }
+
+    private int scoreOutcome(Board hypothetical, int depth) {
+        if (hypothetical.hasPlayerWon(this)) {
+            return 10 - depth;
+        } else if (hypothetical.isFilled()) {
+            return 0;
+        } else {
+            return -10 + depth;
+        }
     }
 }
 
@@ -195,7 +215,7 @@ class Board {
         return false;
     }
 
-    private boolean isFilled() {
+    public boolean isFilled() {
 
         for (int i=0; i < spaces.length; i++) {
             if (spaces[i].getState() == BoardState.EMPTY) {
@@ -206,7 +226,7 @@ class Board {
         return true;
     }
 
-    private boolean hasPlayerWon(Player player) {
+    public boolean hasPlayerWon(Player player) {
 
         // Board as indexed by the array 'spaces':
         //  0  1  2
